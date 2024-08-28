@@ -1,0 +1,452 @@
+﻿Build1=Default,b4a.example
+Build2=DCA,b4a.dca
+File1=Crea_T.bal
+File10=Layout.bal
+File11=logo.png
+File12=logo00.png
+File13=plcdatabase.db
+File14=properties.csv
+File15=Visual.bal
+File2=datepicker.bal
+File3=dcalogo.png
+File4=Depositos.bal
+File5=Edit.bal
+File6=EJEMPLO.csv
+File7=EXTRAS.bal
+File8=Gastos.bal
+File9=img.jpg
+FileGroup1=DBFiles
+FileGroup10=DBFiles
+FileGroup11=DBFiles
+FileGroup12=DBFiles
+FileGroup13=DBFiles
+FileGroup14=DBFiles
+FileGroup15=Default Group
+FileGroup2=DBFiles
+FileGroup3=DBFiles
+FileGroup4=DBFiles
+FileGroup5=DBFiles
+FileGroup6=DBFiles
+FileGroup7=Default Group
+FileGroup8=DBFiles
+FileGroup9=DBFiles
+Group=Default Group
+Library1=accessibility
+Library10=javaobject
+Library11=modbustcp
+Library12=phone
+Library13=reflection
+Library14=runtimepermissions
+Library15=sql
+Library16=stringfunctions
+Library17=stringutils
+Library18=xui
+Library2=animation
+Library3=b4xpages
+Library4=b4xtable
+Library5=bctoast
+Library6=byteconverter
+Library7=core
+Library8=dbutils
+Library9=excel
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="33"/>~\n~<supports-screens android:largeScreens="true"~\n~	android:name="android.permission.WRITE_EXTERNAL_STORAGE" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~	~\n~AddPermission("android.permission.MANAGE_EXTERNAL_STORAGE")~\n~SetApplicationAttribute(android:requestLegacyExternalStorage, true)~\n~~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~'End of default text.~\n~~\n~AddManifestText(~\n~<uses-permission~\n~  android:name="android.permission.WRITE_EXTERNAL_STORAGE"~\n~  android:maxSdkVersion="19" />~\n~)~\n~
+Module1=B4XMainPage
+Module2=Connection
+Module3=Crear
+Module4=Editar
+Module5=ManageExternalStorage
+Module6=Starter
+Module7=Visualizacion
+NumberOfFiles=15
+NumberOfLibraries=18
+NumberOfModules=7
+Version=12.5
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: Lusi
+	#VersionCode: 1
+	#VersionName: PLCController
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+	#BridgeLogger: true 
+	' lo quitamos mas adelante 
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: False
+#End Region
+
+Sub Process_Globals
+	
+	
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+	Private xui As XUI
+	Dim Status As String
+	Dim ID As String
+	Dim N_ProjectName, N_DateInit, N_DateFinish, N_AdminDCA, N_AdminPlanta, N_NameEnterprise, N_EnterpriseAddress, N_Phone As String
+	Dim N_PhoneNum As Int
+	Dim bCreated As Boolean
+	
+	Dim Objecto, Nombre, TipoDeBoton, LocXX, LocYY, AnchoX, LargoY, Color, DireccionRegistro  As String
+	
+	''//IMPORT
+	Dim CC As ContentChooser 'Phone Library}
+	Private MyListC, HeaderC As List
+
+
+	Private rp As RuntimePermissions
+	Dim device As Phone
+	Dim MES As ManageExternalStorage
+End Sub
+
+
+Sub Globals
+	Dim IDNumMain As String
+	Dim ID_F As StringFunctions
+	
+	'BTExecute, BTEdit
+	'These global variables will be redeclared each time the activity is created.
+	Dim BTCreate, BTOpen, BTImport As Button
+	Private ListViewer As ListView
+	
+	Private UPPanel As Panel
+	Private DOWNPanel As Panel
+	
+	Private UPanelAnim, DPanelAnim, BTCreateAnim, BTOpenAnim, BTImportAnim, IVAnim, IVAnim2, IVAnim3 As Animation
+	Private ImageView1 As ImageView
+	Private EditText1 As EditText
+	
+	Dim NName As String
+	
+	Dim bNewInserts = False As Boolean
+	
+End Sub
+
+
+
+Sub Activity_Create(FirstTime As Boolean)
+	Activity.LoadLayout("Layout")
+	
+	If FirstTime Then
+		MES.Initialize(Me, "MES")
+	End If
+	
+	Connection.ConnectionTestDB
+	
+	CC.Initialize("CC")
+	MyListC.Initialize
+	HeaderC.Initialize
+	
+	''//CREATE
+	BTCreate.Initialize("BTCreate")
+	BTCreate.Color = Colors.RGB(34,51,88)
+	BTCreate.TextColor = Colors.White
+	BTCreate.Text = "CREATE"
+	Activity.AddView(BTCreate, 20%x, 10%y, 60%x, 8%y)
+	
+	''//Import
+	BTImport.Initialize("BTImport")
+	BTImport.Color = Colors.RGB(34,51,88)
+	BTImport.TextColor = Colors.White
+	BTImport.Text = "IMPORT"
+	Activity.AddView(BTImport, 20%x, 20%y, 60%x, 8%y)
+	
+	UPPanel.Initialize("UPPanel")
+	UPPanel.Color = Colors.RGB(34,51,88)
+	Activity.AddView(UPPanel,0%x, 0%y, 100%x, 8%y)
+	
+	EditText1.Initialize("EditText1")
+	EditText1.TextColor = Colors.White
+	EditText1.Text = "PLC CONTROLLER"
+	EditText1.TextSize = 25
+	EditText1.Typeface = Typeface.DEFAULT_BOLD
+	EditText1.Enabled = False
+	EditText1.InputType = EditText1.INPUT_TYPE_NONE
+	Activity.AddView(EditText1, 25%x, 0%y, 90%x, 7%y)
+	
+	DOWNPanel.Initialize("DOWNPanel")
+	DOWNPanel.Color = Colors.RGB(111,111,111)
+	Activity.AddView(DOWNPanel,0%x, 93%y, 100%x, 8%y)
+
+	ListViewer.Initialize("ListViewer")
+	ListViewer.TwoLinesLayout.Label.TextColor = Colors.Black
+	ListViewer.TwoLinesLayout.Label.TextSize = 20
+	ListViewer.TwoLinesLayout.SecondLabel.TextColor = Colors.Black
+	ListViewer.TwoLinesLayout.SecondLabel.TextSize = 12
+	Activity.AddView(ListViewer, 5%x, 50%y, 700dip, 700dip)	 
+	
+	ImageView1.Bitmap = LoadBitmap(File.DirAssets, "logo.png")
+	IVAnim.InitializeTranslate("Animation", 0dip, -200dip, 100dip, 700dip)
+	IVAnim2.InitializeTranslate("Animation", 100dip, 700dip, 100dip, -100dip)
+	IVAnim3.InitializeTranslate("Animation", 100dip, -100dip, 0dip, 1000dip)
+	IVAnim.Duration = 10000
+	IVAnim2.Duration = 10000
+	IVAnim3.Duration = 10000
+	ImageView1.Tag = IVAnim
+	
+	UPanelAnim.InitializeAlpha("", 1, 0)
+	UPanelAnim.Duration = 2500
+	UPanelAnim.RepeatCount = -1
+	UPPanel.Tag = UPanelAnim
+	
+	DPanelAnim.InitializeAlpha("", 1, 0)
+	DPanelAnim.Duration = 2500
+	DPanelAnim.RepeatCount = -1
+	DOWNPanel.Tag = DPanelAnim
+	
+	BTCreateAnim.InitializeScaleCenter("", 1,1,1.1,1.1, BTCreate)
+	BTCreateAnim.Duration = 1000
+	BTCreateAnim.RepeatCount = -1
+	BTCreate.Tag = BTCreateAnim
+
+	BTImportAnim.InitializeScaleCenter("", 1,1,1.1,1.1, BTImport)
+	BTImportAnim.Duration = 1000
+	BTImportAnim.RepeatCount = -1
+	BTImport.Tag = BTImportAnim
+	
+	ShowDataBase
+	PlayAnims
+	
+	
+'	If ShouldShowRequestPermissionRationale(rp.PERMISSION_WRITE_EXTERNAL_STORAGE) Then
+'       MsgboxAsync("We need permission to access the external storage in order to upload your personal photos to the cloud.", "")
+'       Wait For Msgbox_Result (Result As Int)
+'   End If
+'	rp.CheckAndRequest(rp.PERMISSION_WRITE_EXTERNAL_STORAGE)
+'   Wait For Activity_PermissionResult (Permission As String, Success As Boolean)
+'   If Success Then
+'       For Each f As String In File.ListFiles(File.DirRootExternal)
+'           Log(f)
+'       Next
+	'   End If
+
+'	Dim in As Intent
+'	in.Initialize("android.settings.APPLICATION_DETAILS_SETTINGS", $"package:${Application.PackageName}"$)
+'	Try
+'		StartActivity(in)
+'	Catch
+'		Log("Failed to open app settings")
+'	End Try
+
+	Dim SdkVersion As Int = device.SdkVersion
+	' Choose which permission to request in order to access external storgage
+	If SdkVersion < 30 Then
+		
+		Log("SDK = " & SdkVersion & " : Requesting WRITE_EXTERNAL_STORAGE permission")
+		Dim rp As RuntimePermissions
+		rp.CheckAndRequest(rp.PERMISSION_WRITE_EXTERNAL_STORAGE) ' Implicit read capability if granted
+		Wait For Activity_PermissionResult (Permission As String, Result As Boolean)
+		Log($"PERMISSION_WRITE_EXTERNAL_STORAGE = ${Result}"$)
+		
+	Else
+		
+		Log("SDK = " & SdkVersion & " : Requesting MANAGE_EXTERNAL_STORAGE permission")
+		Log("On Entry MANAGE_EXTERNAL_STORAGE = " & MES.HasPermission)
+		
+		If Not(MES.HasPermission) Then
+			MsgboxAsync("Requerimos manejo de todos los archivos de Android", "Manage All Files")
+			Wait For Msgbox_Result(Res As Int)
+			Log("Getting permission")
+			MES.GetPermission
+			Wait For MES_StorageAvailable
+		End If
+		
+	End If
+	
+End Sub
+
+Sub ShowDataBase
+	
+	ListViewer.Clear
+	Connection.Cursor = Connection.LocalSQL.ExecQuery("Select * FROM sqlite_master where Type='table'")
+	For i = 0 To Connection.Cursor.RowCount - 1
+		Connection.Cursor.Position = i
+		ListViewer.AddTwoLines(Connection.Cursor.GetString("tbl_name"), Connection.Cursor.GetString("name"))
+	Next
+	
+End Sub
+
+
+
+Sub PlayAnims
+	'UPanelAnim.Start(UPPanel)
+	'DPanelAnim.Start(DOWNPanel)
+	BTCreateAnim.Start(BTCreate)
+	BTImportAnim.Start(BTImport)
+	IVAnim.Start(ImageView1)
+End Sub
+
+Sub Animation_AnimationEnd
+	Log("ANIMATION SET")
+	If Sender = IVAnim Then
+		IVAnim2.Start(ImageView1)
+	Else If Sender = IVAnim2 Then
+		IVAnim3.Start(ImageView1)
+	Else If Sender = IVAnim3 Then
+		IVAnim.Start(ImageView1)
+	End If
+End Sub
+
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+Sub BTImport_Click
+	Log("Import Selected")
+	'CC.Show("csv/*", "Choose Format")
+	CC.Show("*/*", "Choose csv")
+	
+End Sub
+
+Sub CC_Result (Success As Boolean, Dir As String, FileName As String)
+	
+	Dim suC As StringUtils
+	
+	
+	MyListC.Initialize
+	HeaderC.Initialize
+	
+	If Success = True Then
+		ToastMessageShow("Success", True)
+		'MyListC = suC.LoadCSV2(File.DirAssets, "EJEMPLO.csv", ",", HeaderC)
+		MyListC = suC.LoadCSV(Dir, FileName, ",")
+		'MyListC = suC.LoadCSV2(Dir, FileName, ",", HeaderC) //WORKS FINE
+		
+	Else
+		ToastMessageShow("No Success :(",True)
+	End If
+	
+	
+	For Each row() As String In MyListC
+		Log(row(0))
+		Log(row(1))
+		Log(row(2))
+		Log(row(3))
+		Log(row(4))
+		Log(row(5))
+		Log(row(6))
+		Log(row(7))
+		Log(row(8))
+		Log(row(9))
+		
+		NName = row(0)
+		Connection.Cursor = Connection.LocalSQL.ExecQuery("CREATE TABLE IF NOT EXISTS "& row(0) &" (ID TEXT PRIMARY KEY, ProjectName TEXT, Name TEXT, Object TEXT, Type INTEGER, LocX INTEGER, LocY INTEGER, WidthX INTEGER, HeightY INTEGER, Color INTEGER, Registro INTEGER)")
+		
+		'Connection.Cursor = Connection.LocalSQL.ExecQuery("CREATE TABLE IF NOT EXISTS "& HeaderC.Get(0) &" (ID TEXT PRIMARY KEY, ProjectName TEXT, Name TEXT, Object TEXT, Type INTEGER, LocX INTEGER, LocY INTEGER, WidthX INTEGER, HeightY INTEGER, Color INTEGER, Registro INTEGER)")
+		
+		Log("Tabla Importada Y Creada")
+		
+		IDFind0
+		
+		'Connection.LocalSQL.ExecNonQuery("INSERT INTO "& row(0) &" VALUES('"& IDNum &"','"& row(0) & "','"& row(1) & "', '"& row(2) &"' ,'"& row(3) & "','"& row(4) & "','"& row(5) & "','"& row(6) & "','"& row(7) & "', '" & row(8) & "', '"& row(9) &"')")
+		If bNewInserts Then
+			IDFind02
+			Connection.LocalSQL.ExecNonQuery2("INSERT INTO "& row(0) &" VALUES (? , ? , ? , ? , ? , ? ,? , ? , ? , ? , ?)", Array As String(IDNumMain, row(0),row(1),row(2),row(3),row(4),row(5),row(6),row(7),row(8),row(9)))
+			Log("INSERSIONES EXITOSAS")
+		End If
+		
+	Next
+
+	
+	
+	ShowDataBase
+	
+End Sub
+
+Sub ExtrasRows
+	
+End Sub
+
+Sub IDFind0
+
+	'Connection.Cursor = Connection.LocalSQL.ExecQuery("SELECT * FROM "& NName &" ORDER BY ID DESC")
+	If Connection.Cursor.RowCount > 0 Then
+		Connection.Cursor.Position = 0
+		IDNumMain = ID_F.Right("00" & ID_F.Trim(ID_F.Val(ID_F.Right(Connection.Cursor.GetString("ID"),3))+1), 3)
+	Else
+		IDNumMain = "001"
+		Log("ELSE")
+		bNewInserts = True
+	End If
+	
+End Sub
+
+Sub IDFind02
+
+	Connection.Cursor = Connection.LocalSQL.ExecQuery("SELECT * FROM "& NName &" ORDER BY ID DESC")
+	If Connection.Cursor.RowCount > 0 Then
+		Connection.Cursor.Position = 0
+		IDNumMain = ID_F.Right("00" & ID_F.Trim(ID_F.Val(ID_F.Right(Connection.Cursor.GetString("ID"),3))+1), 3)
+	Else
+		IDNumMain = "001"
+	End If
+	
+End Sub
+
+Sub BTCreate_Click
+	Status = "S"
+	Activity.Finish
+	StartActivity(Crear)
+End Sub
+
+Sub ListViewer_ItemClick(Position As Int, Value As Object)
+	Status = "U"
+	'Connection.Cursor = Connection.LocalSQL.ExecQuery("SELECT * FROM "& Crear.ProjectNameSTR &" WHERE ProjectName= '"& Value &"'")
+	
+	'Connection.Cursor = Connection.LocalSQL.ExecQuery("SELECT * FROM '"& Value &"' WHERE Name= '"& Value &"'")
+	'For i = 0 To Connection.Cursor.RowCount -1
+	'	Connection.Cursor.Position = i
+	'	ID = Connection.Cursor.GetString("ID")
+	'	Objecto = Connection.Cursor.GetString("Object")
+	'	Nombre = Connection.Cursor.GetString("Name")
+	'	TipoDeBoton = Connection.Cursor.GetString("Type")
+	'	LocXX = Connection.Cursor.GetString("LocX")
+	'	LocYY = Connection.Cursor.GetString("LocY")
+	'	AnchoX = Connection.Cursor.GetString("WidthX")
+	'	LargoY = Connection.Cursor.GetString("HeightY")
+	'	Color = Connection.Cursor.GetString("Color")
+	'	DireccionRegistro = Connection.Cursor.GetString("Registro")
+	'Next
+	
+	'Log(ID)
+	
+	'Dim Objecto, Nombre, TipoDeBoton, LocXX, LocYY, AnchoX, LargoY, Color, DireccionRegistro  As String
+	
+	'(ID TEXT PRIMARY KEY, Object TEXT, Name TEXT, Type TEXT, LocX TEXT, LocY TEXT, WidthX TEXT, HeightY TEXT, Color INTEGER, Registro INTEGER)")
+	Crear.ProjectNameSTR = Value
+	
+	
+	StartActivity(Visualizacion)
+	Activity.Finish
+End Sub
+
+Sub ListViewer_ItemLongClick(Position As Int, Value As Object)
+	
+	'DELETE INFO
+	Connection.Cursor = Connection.LocalSQL.ExecQuery("SELECT * FROM '"& Value &"' WHERE Name='" & Value &"'")
+	For i = 0 To Connection.Cursor.RowCount - 1
+		Connection.Cursor.Position = i
+		ID = Connection.Cursor.GetString("ID")
+	Next
+	
+	Dim OnSelect As Int
+	OnSelect = Msgbox2("DELETE?", "", "Yes", "", "No", Null)
+	
+	If OnSelect = DialogResponse.POSITIVE Then
+		'Connection.LocalSQL.ExecNonQuery("DELETE FROM "& Crear.ProjectNameSTR &" WHERE ID= '"& ID &"'")
+		Connection.LocalSQL.ExecNonQuery("DROP TABLE IF EXISTS "& Value &"")
+		
+		ToastMessageShow("DELETED TABLE", False)
+	End If
+	
+	
+	ShowDataBase
+End Sub
